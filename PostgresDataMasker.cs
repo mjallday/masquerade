@@ -89,11 +89,15 @@ namespace PgMaskingProxy
             string db = (string)dbDetails["database"];
             string user = (string)dbDetails["user"];
 
+            IPHostEntry source = Dns.Resolve(proxySourceIp);
+            IPHostEntry destination = Dns.Resolve(dbIp);
+
+
             Console.WriteLine("Proxy Running:");
             Console.WriteLine($"\tProxy Port: {proxyPort}");
             Console.WriteLine($"\tDatabase Details: {user}@{dbIp}:{dbPort}/{db}");
             _tcpProxy = new TcpProxy(_pgStateMachine.ProcessBuffer, _pgStateMachine.SetStateToInitial);
-            _tcpProxy.Start(new IPEndPoint(IPAddress.Parse(proxySourceIp), proxyPort), new IPEndPoint(IPAddress.Parse(dbIp), dbPort));
+            _tcpProxy.Start(new IPEndPoint(source.AddressList.First(), proxyPort), new IPEndPoint(destination.AddressList.First(), dbPort));
         }
 
         private Func<string,string> getMaskingFunction(uint tableOid, uint dataTypeOid, string columnName)

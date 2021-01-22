@@ -1,7 +1,7 @@
 version: '3'
 services:
   PgMaskingProxyDB:
-    image: postgres:9.6.10
+    image: postgres
     restart: always
     ports:
       - 15432:5432
@@ -12,3 +12,12 @@ services:
     container_name: PgMaskingProxyDB
     volumes:
       - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  proxy:
+    build: .
+    ports:
+    - 20000:20000
+    volumes:
+    - .:/app/
+    depends_on:
+    - PgMaskingProxyDB
